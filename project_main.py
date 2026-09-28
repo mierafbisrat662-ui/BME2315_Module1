@@ -96,3 +96,54 @@ plt.legend()
 plt.savefig("mmse_vs_years_of_education.png")
 
 plt.show()
+
+#separate abeta42 vlaues into dementia and no dementia groups
+dementia_abeta42 = np.array([
+    patient.abeta42
+    for patient in patients
+    if patient.cognitive_status == "Dementia"
+])
+
+no_dementia_abeta42 = np.array([
+    patient.abeta42
+    for patient in patients
+    if patient.cognitive_status == "No dementia"
+])
+
+#calculat mean abeta42 for each group
+dementia_mean = np.mean(dementia_abeta42)
+no_dementia_mean = np.mean(no_dementia_abeta42)
+
+print(f"\nMean Abeta42 for dementia group: {dementia_mean}")
+print("Mean Abeta42 for no dementia group: {no_dementia_mean}")
+
+#independent t-test
+t_statistic, p_value_abeta = stats.ttest_ind(
+    dementia_abeta42,
+    no_dementia_abeta42
+)
+
+print(f"T-statistic: {t_statistic}")
+print(f"P-value: {p_value_abeta}")
+
+#make bar graph
+groups = ["Dementia", "No Dementia"]
+means = [dementia_mean, no_dementia_mean]
+
+plt.bar(groups, means)
+
+plt.xlabel("Cognitive Status")
+plt.ylabel("Mean ABeta42 (pg/ug)")
+plt.title("Mean ABeta42 by Dementia Status")
+
+plt.text(
+    0.05, 0.95,
+    f'Dementia Mean = {dementia_mean:.2f}\n'
+    f'No Dementia Mean = {no_dementia_mean:.2f}\n'
+    f'p = {p_value_abeta:.4f}',
+    transform=plt.gca().transAxes,
+    verticalalignment='top'
+)
+
+plt.savefig("mean_abeta42_dementia_groups.png")
+plt.show()
